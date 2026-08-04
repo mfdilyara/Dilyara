@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Насколько хорошо ты меня знаешь?</title>
+<style>
+  :root{
+    --bg: #FAFAFA;
+    --card: #FFFFFF;
+    --ink: #0B0B0E;
+    --ink-soft: #6B6B76;
+    --line: #E7E7EC;
+    --accent: #6D5EF5;
+    --accent-soft: #EFEDFE;
+    --green: #17A673;
+    --green-soft: #E8F8F1;
+    --red: #E5484D;
+    --red-soft: #FDECEC;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --shadow: 0 1px 2px rgba(11,11,14,0.04), 0 12px 32px -12px rgba(11,11,14,0.10);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0; padding:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    padding: 56px 20px 96px;
+  }
+
+  .bg-glow{
+    position: fixed; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(600px 320px at 15% -5%, rgba(109,94,245,0.10), transparent 60%),
+      radial-gradient(500px 300px at 100% 10%, rgba(109,94,245,0.06), transparent 60%);
+    z-index: 0;
+  }
+
+  .shell{
+    position: relative; z-index: 1;
+    width: 100%; max-width: 640px;
+  }
+
+  .progress-wrap{
+    position: sticky; top: 16px; z-index: 5;
+    background: rgba(250,250,250,0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+    display:flex; align-items:center; gap: 14px;
+    animation: dropIn 0.6s cubic-bezier(.16,1,.3,1);
+  }
+  .progress-label{ font-size: 13px; color: var(--ink-soft); white-space: nowrap; letter-spacing: -0.01em; }
+  .progress-label b{ color: var(--ink); font-weight: 700; }
+  .progress-track{ flex:1; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .progress-fill{ height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), #8B7BFF); transition: width 0.5s cubic-bezier(.16,1,.3,1); }
+
+  header{ margin-bottom: 32px; animation: dropIn 0.7s cubic-bezier(.16,1,.3,1); }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 6px 12px; border-radius: 999px; margin-bottom: 18px;
+  }
+  h1{ font-size: 32px; line-height: 1.15; letter-spacing: -0.03em; font-weight: 800; margin: 0 0 12px; }
+  .subtitle{ font-size: 16px; line-height: 1.55; color: var(--ink-soft); margin: 0; max-width: 50ch; }
+
+  .qcard{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 22px 22px 18px;
+    margin-bottom: 18px;
+    animation: dropIn 0.6s cubic-bezier(.16,1,.3,1);
+  }
+  .qcard.locked .option:not(.correct):not(.picked){ opacity: 0.5; }
+
+  .qhead{ display:flex; align-items:center; gap: 10px; margin-bottom: 14px; }
+  .qnum{
+    flex:none; width: 26px; height: 26px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent);
+    font-size: 12px; font-weight: 800;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .qtext{ font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+
+  .options{ display: grid; gap: 8px; }
+  .option{
+    display:flex; align-items:center; gap: 12px;
+    padding: 13px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.18s cubic-bezier(.16,1,.3,1);
+    font-size: 14.5px;
+    letter-spacing: -0.01em;
+  }
+  .option:hover{ border-color: #D5D3E6; background: #FAFAFC; }
+  .option-dot{
+    flex:none; width: 20px; height: 20px; border-radius: 999px;
+    border: 1.5px solid #C9C9D4; background: #fff;
+    display:flex; align-items:center; justify-content:center;
+    transition: all 0.18s cubic-bezier(.16,1,.3,1);
+  }
+  .option-dot svg{ width: 11px; height: 11px; opacity: 0; transform: scale(0.5); transition: all 0.18s cubic-bezier(.16,1,.3,1); }
+
+  .option.picked.correct{
+    background: var(--green-soft); border-color: var(--green);
+  }
+  .option.picked.correct .option-dot{ background: var(--green); border-color: var(--green); }
+  .option.picked.correct .option-dot svg{ opacity: 1; transform: scale(1); }
+
+  .option.picked.wrong{
+    background: var(--red-soft); border-color: var(--red);
+  }
+  .option.picked.wrong .option-dot{ background: var(--red); border-color: var(--red); }
+  .option.picked.wrong .option-dot svg{ opacity: 1; transform: scale(1); }
+
+  .option.reveal.correct:not(.picked){
+    border-color: var(--green);
+    background: var(--green-soft);
+  }
+
+  .qcard.locked .option{ pointer-events: none; }
+
+  /* Result section */
+  .result{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 32px 28px;
+    margin-top: 8px;
+    margin-bottom: 24px;
+    opacity: 0; transform: translateY(14px);
+    max-height: 0; overflow: hidden;
+    transition: opacity 0.5s cubic-bezier(.16,1,.3,1), transform 0.5s cubic-bezier(.16,1,.3,1), max-height 0.5s cubic-bezier(.16,1,.3,1);
+  }
+  .result.visible{ opacity: 1; transform: translateY(0); max-height: 600px; }
+
+  .result-top{ display:flex; align-items:center; gap: 22px; margin-bottom: 22px; }
+  .ring-wrap{ position: relative; flex: none; width: 84px; height: 84px; }
+  .ring-wrap svg{ width: 84px; height: 84px; transform: rotate(-90deg); }
+  .ring-bg{ fill: none; stroke: var(--line); stroke-width: 8; }
+  .ring-fg{
+    fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round;
+    stroke-dasharray: 219.9; stroke-dashoffset: 219.9;
+    transition: stroke-dashoffset 0.7s cubic-bezier(.16,1,.3,1) 0.2s, stroke 0.4s ease;
+  }
+  .ring-center{ position: absolute; inset: 0; display:flex; align-items:center; justify-content:center; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+
+  .result-heading{ font-size: 13px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 4px; }
+  .result-score{ font-size: 15px; color: var(--ink-soft); margin: 0; }
+  .result-score b{ color: var(--ink); font-weight: 800; font-size: 17px; }
+
+  .badge{
+    display:inline-flex; align-items:center; gap: 8px;
+    font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .badge.green{ background: var(--green-soft); color: var(--green); }
+  .badge.amber{ background: #FDF4E1; color: #8A6100; }
+  .badge.red{ background: var(--red-soft); color: var(--red); }
+
+  .result-title{ font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px; }
+  .result-text{ font-size: 15px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 20px; }
+
+  .retry-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--ink); color: #fff;
+    border: none; border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .retry-btn:hover{ transform: translateY(-1px); opacity: 0.9; }
+
+  footer{ text-align:center; font-size: 12.5px; color: #B4B4BC; margin-top: 32px; }
+
+  @keyframes dropIn{ from{ opacity:0; transform: translateY(-8px); } to{ opacity:1; transform: translateY(0); } }
+  @media (max-width: 480px){ h1{ font-size: 26px; } .result-top{ flex-direction: column; align-items:flex-start; } }
+  @media (prefers-reduced-motion: reduce){ *{ animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="shell">
+
+  <div class="progress-wrap">
+    <span class="progress-label">Отвечено <b id="progressCount">0</b> / <span id="totalCount">5</span></span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <header>
+    <span class="eyebrow">Тест для подруг · 2 минуты</span>
+    <h1>Насколько хорошо ты меня знаешь?</h1>
+    <p class="subtitle">Выбирай вариант в каждом вопросе — правильный ответ подсветится сразу, а в конце увидишь итоговый результат.</p>
+  </header>
+
+  <div id="quiz"></div>
+
+  <div class="result" id="result">
+    <div class="result-top">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 84 84">
+          <circle class="ring-bg" cx="42" cy="42" r="35"></circle>
+          <circle class="ring-fg" id="ringFg" cx="42" cy="42" r="35"></circle>
+        </svg>
+        <div class="ring-center" id="ringCenter">0</div>
+      </div>
+      <div>
+        <p class="result-heading">Итоговый результат</p>
+        <p class="result-score"><b id="scoreValue">0</b> из <span id="scoreTotal">5</span></p>
+      </div>
+    </div>
+
+    <div id="badgeWrap"></div>
+    <h2 class="result-title" id="resultTitle"></h2>
+    <p class="result-text" id="resultText"></p>
+
+    <button class="retry-btn" id="retryBtn">Пройти ещё раз</button>
+  </div>
+
+  <footer>Сделано с любовью — для тех, кто правда меня знает 💜</footer>
+
+</div>
+
+<script>
+  const questions = [
+    {
+      text: "Как меня зовут по-настоящему (полное имя)?",
+      options: [
+        "Идиятуллина Диляра Илдаровна",
+        "Идиятуллина Диляра Ильнаровна",
+        "Идиатуллина Диляра Ильшатовна",
+        "Идиятуллина Диляра Ириковна"
+      ],
+      correct: 0
+    },
+    {
+      text: "В каком городе я родилась?",
+      options: ["Альметьевск", "Москва", "Казань", "Дубай"],
+      correct: 2
+    },
+    {
+      text: "Кем я мечтала стать в детстве?",
+      options: ["Учителем", "Актрисой", "Врачом", "Певицой"],
+      correct: 1
+    },
+    {
+      text: "Моя любимая еда?",
+      options: ["Картошка", "Гречка", "Хлеб", "Мясо"],
+      correct: 0
+    },
+    {
+      text: "Моя главная слабость?",
+      options: ["Шоколад", "Шоппинг", "Сериалы", "ChatGPT"],
+      correct: 2
+    }
+  ];
+
+  const total = questions.length;
+  const answers = new Array(total).fill(null);
+
+  const quizEl = document.getElementById('quiz');
+  const progressFill = document.getElementById('progressFill');
+  const progressCount = document.getElementById('progressCount');
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('scoreTotal').textContent = total;
+
+  const checkIcon = `<svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const crossIcon = `<svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
+
+  function renderQuiz(){
+    quizEl.innerHTML = '';
+    questions.forEach((q, qi) => {
+      const card = document.createElement('div');
+      card.className = 'qcard';
+      card.dataset.index = qi;
+
+      const optionsHtml = q.options.map((opt, oi) => `
+        <div class="option" data-oi="${oi}">
+          <span class="option-dot"></span>
+          <span>${opt}</span>
+        </div>
+      `).join('');
+
+      card.innerHTML = `
+        <div class="qhead">
+          <span class="qnum">${qi + 1}</span>
+          <span class="qtext">${q.text}</span>
+        </div>
+        <div class="options">${optionsHtml}</div>
+      `;
+
+      card.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', () => selectAnswer(qi, Number(opt.dataset.oi)));
+      });
+
+      quizEl.appendChild(card);
+    });
+  }
+
+  function selectAnswer(qi, oi){
+    if(answers[qi] !== null) return;
+    answers[qi] = oi;
+
+    const card = quizEl.querySelector(`.qcard[data-index="${qi}"]`);
+    card.classList.add('locked');
+
+    const q = questions[qi];
+    card.querySelectorAll('.option').forEach((el, i) => {
+      if(i === oi) el.classList.add('picked');
+      if(i === q.correct){
+        el.classList.add('correct');
+        el.querySelector('.option-dot').innerHTML = checkIcon;
+      } else if(i === oi){
+        el.classList.add('wrong');
+        el.querySelector('.option-dot').innerHTML = crossIcon;
+      }
+    });
+
+    update();
+  }
+
+  const RING_CIRC = 219.9;
+  const resultBox = document.getElementById('result');
+  const scoreValue = document.getElementById('scoreValue');
+  const ringFg = document.getElementById('ringFg');
+  const ringCenter = document.getElementById('ringCenter');
+  const badgeWrap = document.getElementById('badgeWrap');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultText = document.getElementById('resultText');
+
+  const tiers = [
+    {
+      min: 0, max: 1, cls: 'red', icon: '🔴',
+      label: 'Есть куда расти',
+      color: 'var(--red)',
+      title: 'Нам явно нужно больше созваниваться',
+      text: 'Пора устроить вечер вопросов и разговоров по душам — обещаю, будет что обсудить.'
+    },
+    {
+      min: 2, max: 3, cls: 'amber', icon: '🟡',
+      label: 'Неплохо, но не всё',
+      color: 'var(--amber, #E5A100)',
+      title: 'Ты знаешь меня довольно хорошо',
+      text: 'Основное точно уловила, но пара деталей всё же ускользнула. Расскажу лично — при встрече.'
+    },
+    {
+      min: 4, max: 5, cls: 'green', icon: '🟢',
+      label: 'Знаешь меня отлично',
+      color: 'var(--green)',
+      title: 'Ты знаешь меня как облупленную',
+      text: 'Настоящая подруга! Ты точно из тех, кому можно доверить все секреты.'
+    }
+  ];
+
+  function getTier(score){
+    return tiers.find(t => score >= t.min && score <= t.max);
+  }
+
+  function update(){
+    const answeredCount = answers.filter(a => a !== null).length;
+    progressCount.textContent = answeredCount;
+    progressFill.style.width = (answeredCount / total * 100) + '%';
+
+    if(answeredCount < total){
+      resultBox.classList.remove('visible');
+      return;
+    }
+
+    const score = questions.reduce((acc, q, i) => acc + (answers[i] === q.correct ? 1 : 0), 0);
+    const tier = getTier(score);
+
+    scoreValue.textContent = score;
+    ringCenter.textContent = score;
+    ringFg.style.stroke = tier.color;
+    ringFg.style.strokeDashoffset = RING_CIRC - (RING_CIRC * score / total);
+
+    badgeWrap.innerHTML = `<span class="badge ${tier.cls}">${tier.icon} ${tier.label}</span>`;
+    resultTitle.textContent = tier.title;
+    resultText.textContent = tier.text;
+
+    resultBox.classList.add('visible');
+  }
+
+  document.getElementById('retryBtn').addEventListener('click', () => {
+    for(let i = 0; i < total; i++) answers[i] = null;
+    resultBox.classList.remove('visible');
+    renderQuiz();
+    progressCount.textContent = 0;
+    progressFill.style.width = '0%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  renderQuiz();
+</script>
+
+</body>
+</html>
