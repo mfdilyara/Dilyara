@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Академия Эдюсон — Чек-лист внедрения ИИ</title>
+<style>
+  :root{
+    --bg:#F7F8FB;
+    --surface:#FFFFFF;
+    --text:#151833;
+    --text-secondary:#5B5F7A;
+    --text-faint:#9296AC;
+    --primary:#3F3DF2;
+    --primary-dark:#2E2CC9;
+    --primary-light:#EEEEFE;
+    --border:#E4E5F1;
+    --border-strong:#CBCDE3;
+    --success:#1AA35C;
+    --success-bg:#E9F9F0;
+    --danger:#E0483E;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:10px;
+    --shadow-card:0 1px 2px rgba(21,24,51,0.04), 0 8px 24px rgba(21,24,51,0.05);
+    --shadow-elevated:0 12px 32px rgba(21,24,51,0.10), 0 2px 8px rgba(21,24,51,0.06);
+    --ease:cubic-bezier(.22,.68,.36,1);
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+
+  html{-webkit-text-size-adjust:100%;}
+
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(63,61,242,0.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(63,61,242,0.05), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .app{
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:40px 20px 64px;
+  }
+
+  .shell{
+    width:100%;
+    max-width:640px;
+  }
+
+  /* Brand */
+  .brand{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-weight:800;
+    font-size:15px;
+    letter-spacing:0.01em;
+    color:var(--text);
+  }
+  .brand .mark{
+    width:30px;height:30px;
+    border-radius:9px;
+    background:linear-gradient(135deg,var(--primary),#6C6AF7);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:14px;
+    flex-shrink:0;
+    box-shadow:0 4px 12px rgba(63,61,242,0.35);
+  }
+  .brand-row{
+    display:flex;
+    justify-content:center;
+    margin-bottom:28px;
+  }
+
+  /* Progress */
+  .progress-wrap{
+    margin-bottom:28px;
+  }
+  .progress-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-secondary);
+    margin-bottom:10px;
+  }
+  .progress-track{
+    height:6px;
+    background:var(--border);
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--primary),#6C6AF7);
+    border-radius:99px;
+    transition:width .45s var(--ease);
+  }
+
+  /* Card */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:36px 32px;
+    box-shadow:var(--shadow-card);
+  }
+  @media (max-width:480px){
+    .card{padding:26px 20px;border-radius:16px;}
+    .app{padding:24px 12px 48px;}
+  }
+
+  .step{
+    animation:stepIn .38s var(--ease);
+  }
+  @keyframes stepIn{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .step.leaving{
+    animation:stepOut .18s var(--ease) forwards;
+  }
+  @keyframes stepOut{
+    from{opacity:1; transform:translateY(0);}
+    to{opacity:0; transform:translateY(-6px);}
+  }
+
+  .badge{
+    display:inline-block;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--primary);
+    background:var(--primary-light);
+    padding:6px 14px;
+    border-radius:99px;
+    margin-bottom:18px;
+    letter-spacing:0.01em;
+  }
+
+  h1.title{
+    font-size:26px;
+    line-height:1.28;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 12px;
+  }
+  h2.title{
+    font-size:22px;
+    line-height:1.3;
+    font-weight:800;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+  }
+  .subtitle{
+    font-size:15.5px;
+    color:var(--text-secondary);
+    margin:0 0 26px;
+  }
+  .disclaimer{
+    font-size:13px;
+    color:var(--text-faint);
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:12px 14px;
+    margin:20px 0 28px;
+  }
+
+  /* Fields */
+  .field{
+    margin-bottom:22px;
+  }
+  .field:last-of-type{margin-bottom:0;}
+  .field-label{
+    display:block;
+    font-size:14.5px;
+    font-weight:700;
+    margin-bottom:4px;
+    color:var(--text);
+  }
+  .field-hint{
+    font-size:13px;
+    color:var(--text-faint);
+    margin-bottom:10px;
+  }
+  input[type="text"], textarea{
+    width:100%;
+    font-family:inherit;
+    font-size:15px;
+    color:var(--text);
+    background:var(--bg);
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:13px 14px;
+    resize:vertical;
+    transition:border-color .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease);
+  }
+  textarea{min-height:88px;}
+  input[type="text"]:focus, textarea:focus{
+    outline:none;
+    border-color:var(--primary);
+    background:#fff;
+    box-shadow:0 0 0 4px var(--primary-light);
+  }
+  input[type="text"]::placeholder, textarea::placeholder{color:var(--text-faint);}
+
+  .error-msg{
+    font-size:13px;
+    color:var(--danger);
+    margin-top:7px;
+    font-weight:600;
+    display:none;
+    align-items:center;
+    gap:6px;
+  }
+  .field.has-error input[type="text"], .field.has-error .chip-grid{
+    border-color:var(--danger);
+  }
+  .field.has-error .error-msg{display:flex;}
+  .field.has-error input[type="text"]{border-color:var(--danger);}
+
+  /* Chip grid (single & multi select) */
+  .chip-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .chip{
+    cursor:pointer;
+    user-select:none;
+    padding:11px 16px;
+    border-radius:var(--radius-sm);
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--text);
+    transition:all .16s var(--ease);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    line-height:1.3;
+  }
+  .chip:hover{
+    border-color:var(--border-strong);
+    background:var(--bg);
+  }
+  .chip:focus-visible{
+    outline:2px solid var(--primary);
+    outline-offset:2px;
+  }
+  .chip.selected{
+    background:var(--primary-light);
+    border-color:var(--primary);
+    color:var(--primary-dark);
+  }
+  .chip .dot{
+    width:16px;height:16px;
+    border-radius:5px;
+    border:1.5px solid var(--border-strong);
+    background:#fff;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .16s var(--ease);
+  }
+  .chip.single .dot{border-radius:50%;}
+  .chip.selected .dot{
+    background:var(--primary);
+    border-color:var(--primary);
+  }
+  .chip.selected .dot::after{
+    content:"";
+    width:5px;height:8px;
+    border-right:2px solid #fff;
+    border-bottom:2px solid #fff;
+    transform:rotate(45deg) translate(-1px,-1px);
+  }
+  .chip.single.selected .dot::after{
+    width:6px;height:6px;
+    border:none;
+    border-radius:50%;
+    background:#fff;
+    transform:none;
+  }
+
+  .other-field{
+    margin-top:14px;
+    animation:stepIn .25s var(--ease);
+  }
+
+  /* Nav buttons */
+  .nav-row{
+    display:flex;
+    gap:12px;
+    margin-top:30px;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:15.5px;
+    font-weight:700;
+    border-radius:var(--radius-sm);
+    padding:15px 22px;
+    border:none;
+    cursor:pointer;
+    transition:all .16s var(--ease);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:52px;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg,var(--primary),#5250F5);
+    color:#fff;
+    flex:1;
+    box-shadow:0 8px 20px rgba(63,61,242,0.28);
+  }
+  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 10px 26px rgba(63,61,242,0.35);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-secondary{
+    background:var(--bg);
+    color:var(--text-secondary);
+    border:1.5px solid var(--border);
+  }
+  .btn-secondary:hover{background:var(--border); color:var(--text);}
+  .btn:focus-visible{outline:2px solid var(--primary); outline-offset:2px;}
+  .btn-full{width:100%;}
+
+  /* Final screen */
+  .final-header{text-align:center; margin-bottom:26px;}
+  .final-header .badge{background:var(--success-bg); color:var(--success);}
+  .final-header h1{margin-bottom:8px;}
+  .final-header p{color:var(--text-secondary); font-size:15px; margin:0;}
+
+  .result-box{
+    background:var(--bg);
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:20px;
+    max-height:420px;
+    overflow-y:auto;
+    margin-bottom:18px;
+  }
+  .result-box pre{
+    margin:0;
+    white-space:pre-wrap;
+    word-break:break-word;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12.8px;
+    line-height:1.65;
+    color:var(--text);
+  }
+
+  .copy-feedback{
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:var(--success-bg);
+    color:var(--success);
+    font-weight:700;
+    font-size:14px;
+    padding:12px 14px;
+    border-radius:var(--radius-sm);
+    margin-top:12px;
+  }
+  .copy-feedback.show{display:flex; animation:stepIn .3s var(--ease);}
+  .copy-feedback small{font-weight:500; color:var(--text-secondary); display:block; margin-top:2px;}
+
+  /* Info block: what you'll get */
+  .info-block{
+    margin-top:22px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:28px;
+  }
+  .info-block h3{
+    font-size:18px;
+    margin:0 0 14px;
+    font-weight:800;
+  }
+  .info-block ul{
+    margin:0;
+    padding:0;
+    list-style:none;
+  }
+  .info-block li{
+    display:flex;
+    gap:10px;
+    font-size:14.5px;
+    color:var(--text-secondary);
+    padding:9px 0;
+    border-top:1px solid var(--border);
+  }
+  .info-block li:first-child{border-top:none;}
+  .info-block li::before{
+    content:"";
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--primary);
+    margin-top:8px;
+    flex-shrink:0;
+  }
+
+  /* Program CTA */
+  .promo-block{
+    margin-top:22px;
+    background:linear-gradient(150deg,#1B1A4E, #2E2CC9 65%, #3F3DF2);
+    border-radius:var(--radius-lg);
+    padding:30px 28px;
+    color:#fff;
+    box-shadow:var(--shadow-elevated);
+  }
+  .promo-block .brand{color:#fff; opacity:0.9;}
+  .promo-block .brand .mark{background:rgba(255,255,255,0.16); box-shadow:none;}
+  .promo-block h3{
+    font-size:21px;
+    margin:16px 0 10px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+  }
+  .promo-block p{
+    font-size:14.5px;
+    color:rgba(255,255,255,0.82);
+    margin:0 0 22px;
+    line-height:1.6;
+  }
+  .promo-block a.btn-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:#fff;
+    color:var(--primary-dark);
+    font-weight:800;
+    font-size:15px;
+    padding:14px 22px;
+    border-radius:var(--radius-sm);
+    text-decoration:none;
+    transition:transform .16s var(--ease);
+  }
+  .promo-block a.btn-cta:hover{transform:translateY(-1px);}
+
+  /* Title screen specifics */
+  .title-screen{text-align:center;}
+  .title-screen .emoji-title{font-size:24px;}
+  .title-screen .subtitle{margin-left:auto;margin-right:auto;max-width:480px;}
+  .title-screen .disclaimer{text-align:left;}
+
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:99px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="shell">
+
+    <div class="brand-row" id="topBrand">
+      <div class="brand"><span class="mark">Э</span> Академия Эдюсон</div>
+    </div>
+
+    <div id="progressWrap" class="progress-wrap" style="display:none;">
+      <div class="progress-label">
+        <span id="progressText">Шаг 1 из 6</span>
+        <span id="progressPercent">17%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:17%;"></div></div>
+    </div>
+
+    <div class="card" id="cardRoot">
+      <!-- step content injected here -->
+    </div>
+
+    <div id="afterCard"></div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var state = {
+    industry: "",
+    employees: "",
+    product: "",
+    mainGoal: "",
+    blockers: [], blockersOther: "",
+    timeSinks: [], timeSinksOther: "",
+    processes: [], processesOther: "",
+    personalTasks: [], personalTasksOther: "",
+    aiGoals: [], aiGoalsOther: "",
+    constraints: [], constraintsOther: ""
+  };
+
+  var currentStep = 0; // 0 = title, 1..6 = form steps, 7 = final
+  var TOTAL_STEPS = 6;
+
+  var cardRoot = document.getElementById("cardRoot");
+  var afterCard = document.getElementById("afterCard");
+  var progressWrap = document.getElementById("progressWrap");
+  var progressText = document.getElementById("progressText");
+  var progressPercent = document.getElementById("progressPercent");
+  var progressFill = document.getElementById("progressFill");
+
+  function esc(str){
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function updateProgress(step){
+    if(step >= 1 && step <= TOTAL_STEPS){
+      progressWrap.style.display = "block";
+      var pct = Math.round((step / TOTAL_STEPS) * 100);
+      progressText.textContent = "Шаг " + step + " из " + TOTAL_STEPS;
+      progressPercent.textContent = pct + "%";
+      progressFill.style.width = pct + "%";
+    } else {
+      progressWrap.style.display = "none";
+    }
+  }
+
+  function renderTransition(renderFn){
+    var existing = cardRoot.querySelector(".step");
+    if(existing){
+      existing.classList.add("leaving");
+      setTimeout(function(){
+        renderFn();
+      }, 160);
+    } else {
+      renderFn();
+    }
+  }
+
+  function goTo(step){
+    renderTransition(function(){
+      currentStep = step;
+      updateProgress(step);
+      render();
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
+  }
+
+  /* ---------- Multi/single select chip builder ---------- */
+  function buildChipGrid(containerId, options, selectedArr, mode, otherKey, otherLabel){
+    var wrap = document.createElement("div");
+    wrap.className = "chip-grid";
+    wrap.id = containerId;
+
+    options.forEach(function(opt){
+      var chip = document.createElement("div");
+      chip.className = "chip" + (mode === "single" ? " single" : "");
+      chip.tabIndex = 0;
+      chip.setAttribute("role", mode === "single" ? "radio" : "checkbox");
+      var isSelected = selectedArr.indexOf(opt) !== -1;
+      chip.setAttribute("aria-checked", isSelected ? "true" : "false");
+      if(isSelected) chip.classList.add("selected");
+
+      var dot = document.createElement("span");
+      dot.className = "dot";
+      chip.appendChild(dot);
+
+      var label = document.createElement("span");
+      label.textContent = opt;
+      chip.appendChild(label);
+
+      function toggle(){
+        if(mode === "single"){
+          selectedArr.length = 0;
+          selectedArr.push(opt);
+        } else {
+          var idx = selectedArr.indexOf(opt);
+          if(idx === -1){ selectedArr.push(opt); }
+          else { selectedArr.splice(idx,1); }
+        }
+        // re-render chip grid states
+        var allChips = wrap.querySelectorAll(".chip");
+        allChips.forEach(function(c, i){
+          var val = options[i];
+          var sel = selectedArr.indexOf(val) !== -1;
+          c.classList.toggle("selected", sel);
+          c.setAttribute("aria-checked", sel ? "true" : "false");
+        });
+        if(otherKey){
+          toggleOtherField(otherKey, selectedArr.indexOf("Другое") !== -1);
+        }
+      }
+
+      chip.addEventListener("click", toggle);
+      chip.addEventListener("keydown", function(e){
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          toggle();
+        }
+      });
+
+      wrap.appendChild(chip);
+    });
+
+    return wrap;
+  }
+
+  function toggleOtherField(otherKey, show){
+    var el = document.getElementById("other-" + otherKey);
+    if(el){
+      el.style.display = show ? "block" : "none";
+      if(show){
+        var ta = el.querySelector("textarea");
+        if(ta) ta.focus();
+      }
+    }
+  }
+
+  function buildOtherField(otherKey, currentVal, promptText, visible){
+    var wrap = document.createElement("div");
+    wrap.className = "other-field";
+    wrap.id = "other-" + otherKey;
+    wrap.style.display = visible ? "block" : "none";
+
+    var label = document.createElement("label");
+    label.className = "field-label";
+    label.setAttribute("for", "ta-" + otherKey);
+    label.textContent = promptText;
+    wrap.appendChild(label);
+
+    var ta = document.createElement("textarea");
+    ta.id = "ta-" + otherKey;
+    ta.value = currentVal || "";
+    ta.rows = 2;
+    ta.addEventListener("input", function(){
+      state[otherKey] = ta.value;
+    });
+    wrap.appendChild(ta);
+
+    return wrap;
+  }
+
+  /* ---------- Steps ---------- */
+
+  function render(){
+    cardRoot.innerHTML = "";
+    afterCard.innerHTML = "";
+    document.getElementById("topBrand").style.display = (currentStep === 7) ? "none" : "flex";
+
+    if(currentStep === 0) return renderTitleStep();
+    if(currentStep === 1) return renderStep1();
+    if(currentStep === 2) return renderMultiStep({
+      stepNum:2,
+      title:"Что сейчас больше всего тормозит рост?",
+      subtitle:"Выберите всё, что подходит.",
+      options:["Не хватает времени","Всё держится на собственнике","Сотрудники постоянно задают вопросы","Много ручной работы","Медленно принимаются решения","Не хватает прозрачности процессов","Нет единой системы управления","Другое"],
+      selectedArr: state.blockers,
+      otherKey:"blockersOther",
+      otherLabel:"Что ещё мешает росту?"
+    });
+    if(currentStep === 3) return renderMultiStep({
+      stepNum:3,
+      title:"Какие задачи забирают больше всего времени?",
+      subtitle:"Выберите всё, что подходит.",
+      options:["Контроль команды","Совещания","Поиск информации","Переписки","Документы","Аналитика","Подготовка материалов","Постановка задач","Другое"],
+      selectedArr: state.timeSinks,
+      otherKey:"timeSinksOther",
+      otherLabel:"Что ещё забирает время?"
+    });
+    if(currentStep === 4) return renderMultiStep({
+      stepNum:4,
+      title:"Какие процессы вы хотели бы улучшить в первую очередь?",
+      subtitle:"Выберите наиболее актуальные направления.",
+      options:["Продажи","Маркетинг","Работа с клиентами","Управление командой","Операционная деятельность","Аналитика","Документооборот","Планирование","Другое"],
+      selectedArr: state.processes,
+      otherKey:"processesOther",
+      otherLabel:"Какой ещё процесс важно улучшить?"
+    });
+    if(currentStep === 5) return renderMultiStep({
+      stepNum:5,
+      title:"Какие задачи вы по-прежнему выполняете лично?",
+      subtitle:"Выберите всё, что регулярно требует вашего участия.",
+      options:["Принимаю большинство решений","Проверяю сотрудников","Контролирую выполнение задач","Отвечаю клиентам","Провожу совещания","Проверяю документы","Готовлю отчёты","Другое"],
+      selectedArr: state.personalTasks,
+      otherKey:"personalTasksOther",
+      otherLabel:"Что ещё вы делаете лично?"
+    });
+    if(currentStep === 6) return renderStep6();
+    if(currentStep === 7) return renderFinal();
+  }
+
+  function renderTitleStep(){
+    var step = document.createElement("div");
+    step.className = "step title-screen";
+
+    step.innerHTML =
+      '<span class="badge">Чек-лист для собственников бизнеса</span>' +
+      '<h1 class="title"><span class="emoji-title">🤖</span> Получите персональный план внедрения ИИ для вашего бизнеса за 10 минут</h1>' +
+      '<p class="subtitle">Ответьте на вопросы о вашем бизнесе — в конце мы соберём ваши ответы вместе с готовым промптом. Останется скопировать его в ChatGPT, Claude или другую нейросеть.</p>' +
+      '<div class="disclaimer">Это ориентировочный разбор на основе ваших ответов, без учёта полной картины бизнеса.</div>';
+
+    var nav = document.createElement("div");
+    nav.className = "nav-row";
+    var startBtn = document.createElement("button");
+    startBtn.className = "btn btn-primary btn-full";
+    startBtn.textContent = "Начать →";
+    startBtn.addEventListener("click", function(){ goTo(1); });
+    nav.appendChild(startBtn);
+    step.appendChild(nav);
+
+    cardRoot.appendChild(step);
+  }
+
+  function renderStep1(){
+    var step = document.createElement("div");
+    step.className = "step";
+
+    var head = document.createElement("div");
+    head.innerHTML =
+      '<h2 class="title">Расскажите о своём бизнесе</h2>' +
+      '<p class="subtitle">Начнём с основной информации о компании.</p>';
+    step.appendChild(head);
+
+    // Q1 industry
+    var f1 = document.createElement("div");
+    f1.className = "field";
+    f1.id = "field-industry";
+    f1.innerHTML =
+      '<label class="field-label" for="inp-industry">Сфера бизнеса</label>';
+    var inp1 = document.createElement("input");
+    inp1.type = "text";
+    inp1.id = "inp-industry";
+    inp1.placeholder = "Например: онлайн-образование, строительство, e-commerce";
+    inp1.value = state.industry;
+    inp1.addEventListener("input", function(){
+      state.industry = inp1.value;
+      clearError("field-industry");
+    });
+    f1.appendChild(inp1);
+    var err1 = document.createElement("div");
+    err1.className = "error-msg";
+    err1.textContent = "Пожалуйста, укажите сферу бизнеса";
+    f1.appendChild(err1);
+    step.appendChild(f1);
+
+    // Q2 employees (single select)
+    var f2 = document.createElement("div");
+    f2.className = "field";
+    f2.id = "field-employees";
+    f2.innerHTML = '<label class="field-label">Количество сотрудников</label>';
+    var empOptions = ["Только я","2–5","6–20","21–50","51–100","Более 100"];
+    var singleArr = state.employees ? [state.employees] : [];
+    var grid2 = buildChipGrid("grid-employees", empOptions, singleArr, "single");
+    grid2.addEventListener("click", function(){
+      state.employees = singleArr[0] || "";
+      clearError("field-employees");
+    });
+    f2.appendChild(grid2);
+    var err2 = document.createElement("div");
+    err2.className = "error-msg";
+    err2.textContent = "Пожалуйста, выберите количество сотрудников";
+    f2.appendChild(err2);
+    step.appendChild(f2);
+
+    // Q3 product
+    var f3 = document.createElement("div");
+    f3.className = "field";
+    f3.id = "field-product";
+    f3.innerHTML = '<label class="field-label" for="inp-product">Основной продукт или услуга</label>';
+    var inp3 = document.createElement("input");
+    inp3.type = "text";
+    inp3.id = "inp-product";
+    inp3.placeholder = "Например: онлайн-курсы для руководителей";
+    inp3.value = state.product;
+    inp3.addEventListener("input", function(){
+      state.product = inp3.value;
+      clearError("field-product");
+    });
+    f3.appendChild(inp3);
+    var err3 = document.createElement("div");
+    err3.className = "error-msg";
+    err3.textContent = "Пожалуйста, укажите основной продукт или услугу";
+    f3.appendChild(err3);
+    step.appendChild(f3);
+
+    // Q4 main goal
+    var f4 = document.createElement("div");
+    f4.className = "field";
+    f4.innerHTML = '<label class="field-label" for="inp-goal">Главная цель бизнеса на ближайший год</label>';
+    var ta4 = document.createElement("textarea");
+    ta4.id = "inp-goal";
+    ta4.rows = 2;
+    ta4.placeholder = "Например: увеличить выручку, масштабировать команду, выйти на новый рынок";
+    ta4.value = state.mainGoal;
+    ta4.addEventListener("input", function(){ state.mainGoal = ta4.value; });
+    f4.appendChild(ta4);
+    step.appendChild(f4);
+
+    var nav = document.createElement("div");
+    nav.className = "nav-row";
+    var nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-primary btn-full";
+    nextBtn.textContent = "Продолжить →";
+    nextBtn.addEventListener("click", function(){
+      var valid = true;
+      if(!state.industry.trim()){ showError("field-industry"); valid = false; }
+      if(!state.employees){ showError("field-employees"); valid = false; }
+      if(!state.product.trim()){ showError("field-product"); valid = false; }
+      if(valid) goTo(2);
+    });
+    nav.appendChild(nextBtn);
+    step.appendChild(nav);
+
+    cardRoot.appendChild(step);
+  }
+
+  function showError(fieldId){
+    var el = document.getElementById(fieldId);
+    if(el){
+      el.classList.add("has-error");
+      el.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  }
+  function clearError(fieldId){
+    var el = document.getElementById(fieldId);
+    if(el) el.classList.remove("has-error");
+  }
+
+  function renderMultiStep(cfg){
+    var step = document.createElement("div");
+    step.className = "step";
+
+    var head = document.createElement("div");
+    head.innerHTML =
+      '<h2 class="title">' + esc(cfg.title) + '</h2>' +
+      '<p class="subtitle">' + esc(cfg.subtitle) + '</p>';
+    step.appendChild(head);
+
+    var field = document.createElement("div");
+    field.className = "field";
+    var grid = buildChipGrid("grid-" + cfg.stepNum, cfg.options, cfg.selectedArr, "multi", cfg.otherKey, cfg.otherLabel);
+    field.appendChild(grid);
+
+    var otherVisible = cfg.selectedArr.indexOf("Другое") !== -1;
+    var otherField = buildOtherField(cfg.otherKey, state[cfg.otherKey], cfg.otherLabel, otherVisible);
+    field.appendChild(otherField);
+
+    step.appendChild(field);
+
+    var nav = document.createElement("div");
+    nav.className = "nav-row";
+    var backBtn = document.createElement("button");
+    backBtn.className = "btn btn-secondary";
+    backBtn.textContent = "← Назад";
+    backBtn.addEventListener("click", function(){ goTo(cfg.stepNum - 1); });
+    var nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-primary";
+    nextBtn.style.flex = "1";
+    nextBtn.textContent = "Продолжить →";
+    nextBtn.addEventListener("click", function(){ goTo(cfg.stepNum + 1); });
+    nav.appendChild(backBtn);
+    nav.appendChild(nextBtn);
+    step.appendChild(nav);
+
+    cardRoot.appendChild(step);
+  }
+
+  function renderStep6(){
+    var step = document.createElement("div");
+    step.className = "step";
+
+    var head = document.createElement("div");
+    head.innerHTML = '<h2 class="title">Что вы хотите получить благодаря внедрению ИИ?</h2>' +
+      '<p class="subtitle">Выберите всё, что для вас актуально.</p>';
+    step.appendChild(head);
+
+    var aiOptions = ["Освободить время","Снизить операционную нагрузку","Ускорить работу команды","Увеличить прибыль","Навести порядок в процессах","Масштабировать бизнес","Делегировать рутину","Другое"];
+    var f1 = document.createElement("div");
+    f1.className = "field";
+    var grid1 = buildChipGrid("grid-aiGoals", aiOptions, state.aiGoals, "multi", "aiGoalsOther", "Что ещё вы хотите получить?");
+    f1.appendChild(grid1);
+    var otherVisible1 = state.aiGoals.indexOf("Другое") !== -1;
+    f1.appendChild(buildOtherField("aiGoalsOther", state.aiGoalsOther, "Что ещё вы хотите получить?", otherVisible1));
+    step.appendChild(f1);
+
+    var head2 = document.createElement("div");
+    head2.style.marginTop = "30px";
+    head2.innerHTML = '<h2 class="title" style="font-size:19px;">Есть ли ограничения, которые важно учитывать?</h2>';
+    step.appendChild(head2);
+
+    var constrOptions = ["Ограниченный бюджет","Размер команды","Отраслевые требования","Безопасность данных","Существенных ограничений нет","Другое"];
+    var f2 = document.createElement("div");
+    f2.className = "field";
+    var grid2 = buildChipGrid("grid-constraints", constrOptions, state.constraints, "multi", "constraintsOther", "Расскажите подробнее");
+    f2.appendChild(grid2);
+    var otherVisible2 = state.constraints.indexOf("Другое") !== -1;
+    f2.appendChild(buildOtherField("constraintsOther", state.constraintsOther, "Расскажите подробнее", otherVisible2));
+    step.appendChild(f2);
+
+    var nav = document.createElement("div");
+    nav.className = "nav-row";
+    var backBtn = document.createElement("button");
+    backBtn.className = "btn btn-secondary";
+    backBtn.textContent = "← Назад";
+    backBtn.addEventListener("click", function(){ goTo(5); });
+    var nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-primary";
+    nextBtn.style.flex = "1";
+    nextBtn.textContent = "Получить готовый промпт →";
+    nextBtn.addEventListener("click", function(){ goTo(7); });
+    nav.appendChild(backBtn);
+    nav.appendChild(nextBtn);
+    step.appendChild(nav);
+
+    cardRoot.appendChild(step);
+  }
+
+  /* ---------- Final text builder ---------- */
+
+  function listOrNone(arr, otherKey){
+    var items = arr.slice();
+    var idx = items.indexOf("Другое");
+    if(idx !== -1){
+      items.splice(idx, 1);
+      var otherVal = (state[otherKey] || "").trim();
+      if(otherVal) items.push(otherVal);
+    }
+    if(items.length === 0) return "Не указано";
+    return items.join(", ");
+  }
+
+  function textOrNone(val){
+    var v = (val || "").trim();
+    return v ? v : "Не указано";
+  }
+
+  function buildFullText(){
+    var lines = [];
+    lines.push("====================");
+    lines.push("");
+    lines.push("ИНФОРМАЦИЯ О МОЁМ БИЗНЕСЕ");
+    lines.push("");
+    lines.push("Сфера бизнеса:");
+    lines.push(textOrNone(state.industry));
+    lines.push("");
+    lines.push("Количество сотрудников:");
+    lines.push(textOrNone(state.employees));
+    lines.push("");
+    lines.push("Основной продукт или услуга:");
+    lines.push(textOrNone(state.product));
+    lines.push("");
+    lines.push("Главная цель бизнеса на ближайший год:");
+    lines.push(textOrNone(state.mainGoal));
+    lines.push("");
+    lines.push("Что сейчас больше всего тормозит рост:");
+    lines.push(listOrNone(state.blockers, "blockersOther"));
+    lines.push("");
+    lines.push("Какие задачи забирают больше всего времени:");
+    lines.push(listOrNone(state.timeSinks, "timeSinksOther"));
+    lines.push("");
+    lines.push("Какие процессы я хочу улучшить в первую очередь:");
+    lines.push(listOrNone(state.processes, "processesOther"));
+    lines.push("");
+    lines.push("Какие задачи я по-прежнему выполняю лично:");
+    lines.push(listOrNone(state.personalTasks, "personalTasksOther"));
+    lines.push("");
+    lines.push("Что я хочу получить благодаря внедрению ИИ:");
+    lines.push(listOrNone(state.aiGoals, "aiGoalsOther"));
+    lines.push("");
+    lines.push("Ограничения:");
+    lines.push(listOrNone(state.constraints, "constraintsOther"));
+    lines.push("");
+    lines.push("====================");
+    lines.push("");
+    lines.push("Ты — эксперт по внедрению искусственного интеллекта в малый и средний бизнес.");
+    lines.push("");
+    lines.push("Выше я предоставил информацию о своей компании.");
+    lines.push("");
+    lines.push("Проанализируй мои ответы и:");
+    lines.push("");
+    lines.push("1. Определи три главные точки роста моего бизнеса.");
+    lines.push("");
+    lines.push("2. Выдели 3–5 процессов, которые требуют внимания в первую очередь.");
+    lines.push("");
+    lines.push("3. Объясни, почему именно эти процессы сейчас являются приоритетными.");
+    lines.push("");
+    lines.push("4. Покажи, где использование искусственного интеллекта потенциально может дать наибольший эффект.");
+    lines.push("");
+    lines.push("5. Расставь выявленные проблемы по приоритету:");
+    lines.push("— высокий;");
+    lines.push("— средний;");
+    lines.push("— низкий.");
+    lines.push("");
+    lines.push("6. Для каждой приоритетной проблемы кратко объясни, какой бизнес-эффект потенциально может дать её решение.");
+    lines.push("");
+    lines.push("7. В конце сделай короткий вывод:");
+    lines.push("— на чём собственнику стоит сфокусироваться в первую очередь;");
+    lines.push("— какие 1–2 направления внедрения ИИ стоит изучить подробнее.");
+    lines.push("");
+    lines.push("Используй понятный язык.");
+    lines.push("");
+    lines.push("Не придумывай факты о компании и опирайся только на информацию, которую я предоставил.");
+    lines.push("");
+    lines.push("Если данных недостаточно для какого-либо вывода, прямо напиши об этом.");
+    lines.push("");
+    lines.push("Не составляй подробную инструкцию по внедрению конкретных решений и не превращай ответ в полноценную стратегию внедрения ИИ.");
+    lines.push("");
+    lines.push("На этом этапе мне важно понять, ЧТО именно в моём бизнесе стоит улучшать в первую очередь и ПОЧЕМУ.");
+    lines.push("");
+    lines.push("====================");
+
+    return lines.join("\n");
+  }
+
+  function renderFinal(){
+    var step = document.createElement("div");
+    step.className = "step";
+
+    var fh = document.createElement("div");
+    fh.className = "final-header";
+    fh.innerHTML =
+      '<div class="brand" style="justify-content:center; margin-bottom:14px;"><span class="mark">Э</span> Академия Эдюсон</div>' +
+      '<span class="badge">Готово</span>' +
+      '<h1 class="title">Ваш чек-лист готов</h1>' +
+      '<p>Мы собрали ваши ответы и добавили готовый промпт. Скопируйте текст целиком и вставьте его в ChatGPT, Claude или другую нейросеть.</p>';
+    step.appendChild(fh);
+
+    var fullText = buildFullText();
+
+    var resultBox = document.createElement("div");
+    resultBox.className = "result-box";
+    var pre = document.createElement("pre");
+    pre.textContent = fullText;
+    resultBox.appendChild(pre);
+    step.appendChild(resultBox);
+
+    var copyBtn = document.createElement("button");
+    copyBtn.className = "btn btn-primary btn-full";
+    copyBtn.id = "copyBtn";
+    copyBtn.textContent = "Скопировать чек-лист и промпт";
+    copyBtn.addEventListener("click", function(){
+      copyToClipboard(fullText, copyBtn, feedback);
+    });
+    step.appendChild(copyBtn);
+
+    var feedback = document.createElement("div");
+    feedback.className = "copy-feedback";
+    feedback.id = "copyFeedback";
+    feedback.innerHTML = '✓ &nbsp;<span>Скопировано.<small>Теперь вставьте текст в ChatGPT, Claude или другую нейросеть.</small></span>';
+    step.appendChild(feedback);
+
+    var backBtn = document.createElement("button");
+    backBtn.className = "btn btn-secondary btn-full";
+    backBtn.style.marginTop = "12px";
+    backBtn.textContent = "← Изменить ответы";
+    backBtn.addEventListener("click", function(){ goTo(1); });
+    step.appendChild(backBtn);
+
+    cardRoot.appendChild(step);
+
+    // Info block: what you'll get
+    var info = document.createElement("div");
+    info.className = "info-block";
+    info.innerHTML =
+      '<h3>Что вы получите после анализа</h3>' +
+      '<p style="font-size:14.5px;color:var(--text-secondary);margin:0 0 14px;">После анализа нейросеть поможет вам понять:</p>' +
+      '<ul>' +
+        '<li>какие процессы требуют внимания в первую очередь</li>' +
+        '<li>где бизнес теряет больше всего времени</li>' +
+        '<li>какие проблемы сильнее всего ограничивают рост</li>' +
+        '<li>где ИИ потенциально может дать максимальный эффект</li>' +
+        '<li>с какого направления стоит начать</li>' +
+      '</ul>';
+    afterCard.appendChild(info);
+
+    // Promo block
+    var promo = document.createElement("div");
+    promo.className = "promo-block";
+    promo.innerHTML =
+      '<div class="brand"><span class="mark">Э</span> Академия Эдюсон</div>' +
+      '<h3>Персональный план — это только первый шаг</h3>' +
+      '<p>На программе «Мини-МВА: Нейросети для собственников бизнеса» вы не просто получите рекомендации, а научитесь внедрять ИИ в реальные бизнес-процессы, создавать AI-сотрудников и выстраивать систему, которая освобождает время собственника.</p>' +
+      '<a class="btn-cta" href="https://eduson.academy/ai-mba" target="_blank" rel="noopener noreferrer">Узнать подробнее о программе →</a>';
+    afterCard.appendChild(promo);
+  }
+
+  function copyToClipboard(text, btn, feedbackEl){
+    function onSuccess(){
+      btn.textContent = "✓ Скопировано";
+      feedbackEl.classList.add("show");
+      setTimeout(function(){
+        btn.textContent = "Скопировать чек-лист и промпт";
+      }, 2600);
+    }
+    function onFail(){
+      // fallback textarea method
+      try{
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        if(ok){ onSuccess(); }
+      }catch(e){ /* silently ignore */ }
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(onSuccess).catch(onFail);
+    } else {
+      onFail();
+    }
+  }
+
+  /* init */
+  updateProgress(0);
+  render();
+
+})();
+</script>
+
+</body>
+</html>
