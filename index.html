@@ -1,420 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Насколько хорошо ты меня знаешь?</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1015">
+<meta name="description" content="PROSTRANSTVO × АТЛАС ТЕНЕЙ — интерактивная городская игра. Тестовая версия Печати I.">
+<title>АТЛАС ТЕНЕЙ — Печать I</title>
 <style>
-  :root{
-    --bg: #FAFAFA;
-    --card: #FFFFFF;
-    --ink: #0B0B0E;
-    --ink-soft: #6B6B76;
-    --line: #E7E7EC;
-    --accent: #6D5EF5;
-    --accent-soft: #EFEDFE;
-    --green: #17A673;
-    --green-soft: #E8F8F1;
-    --red: #E5484D;
-    --red-soft: #FDECEC;
-    --radius-lg: 24px;
-    --radius-md: 16px;
-    --shadow: 0 1px 2px rgba(11,11,14,0.04), 0 12px 32px -12px rgba(11,11,14,0.10);
-  }
-
-  *{ box-sizing: border-box; }
-
-  html, body{
-    margin:0; padding:0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body{
-    min-height: 100vh;
-    display:flex;
-    justify-content:center;
-    padding: 56px 20px 96px;
-  }
-
-  .bg-glow{
-    position: fixed; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(600px 320px at 15% -5%, rgba(109,94,245,0.10), transparent 60%),
-      radial-gradient(500px 300px at 100% 10%, rgba(109,94,245,0.06), transparent 60%);
-    z-index: 0;
-  }
-
-  .shell{
-    position: relative; z-index: 1;
-    width: 100%; max-width: 640px;
-  }
-
-  .progress-wrap{
-    position: sticky; top: 16px; z-index: 5;
-    background: rgba(250,250,250,0.82);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    padding: 14px 18px;
-    margin-bottom: 28px;
-    box-shadow: var(--shadow);
-    display:flex; align-items:center; gap: 14px;
-    animation: dropIn 0.6s cubic-bezier(.16,1,.3,1);
-  }
-  .progress-label{ font-size: 13px; color: var(--ink-soft); white-space: nowrap; letter-spacing: -0.01em; }
-  .progress-label b{ color: var(--ink); font-weight: 700; }
-  .progress-track{ flex:1; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
-  .progress-fill{ height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), #8B7BFF); transition: width 0.5s cubic-bezier(.16,1,.3,1); }
-
-  header{ margin-bottom: 32px; animation: dropIn 0.7s cubic-bezier(.16,1,.3,1); }
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:6px;
-    font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--accent); background: var(--accent-soft);
-    padding: 6px 12px; border-radius: 999px; margin-bottom: 18px;
-  }
-  h1{ font-size: 32px; line-height: 1.15; letter-spacing: -0.03em; font-weight: 800; margin: 0 0 12px; }
-  .subtitle{ font-size: 16px; line-height: 1.55; color: var(--ink-soft); margin: 0; max-width: 50ch; }
-
-  .qcard{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    padding: 22px 22px 18px;
-    margin-bottom: 18px;
-    animation: dropIn 0.6s cubic-bezier(.16,1,.3,1);
-  }
-  .qcard.locked .option:not(.correct):not(.picked){ opacity: 0.5; }
-
-  .qhead{ display:flex; align-items:center; gap: 10px; margin-bottom: 14px; }
-  .qnum{
-    flex:none; width: 26px; height: 26px; border-radius: 999px;
-    background: var(--accent-soft); color: var(--accent);
-    font-size: 12px; font-weight: 800;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .qtext{ font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
-
-  .options{ display: grid; gap: 8px; }
-  .option{
-    display:flex; align-items:center; gap: 12px;
-    padding: 13px 14px;
-    border: 1.5px solid var(--line);
-    border-radius: 12px;
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.18s cubic-bezier(.16,1,.3,1);
-    font-size: 14.5px;
-    letter-spacing: -0.01em;
-  }
-  .option:hover{ border-color: #D5D3E6; background: #FAFAFC; }
-  .option-dot{
-    flex:none; width: 20px; height: 20px; border-radius: 999px;
-    border: 1.5px solid #C9C9D4; background: #fff;
-    display:flex; align-items:center; justify-content:center;
-    transition: all 0.18s cubic-bezier(.16,1,.3,1);
-  }
-  .option-dot svg{ width: 11px; height: 11px; opacity: 0; transform: scale(0.5); transition: all 0.18s cubic-bezier(.16,1,.3,1); }
-
-  .option.picked.correct{
-    background: var(--green-soft); border-color: var(--green);
-  }
-  .option.picked.correct .option-dot{ background: var(--green); border-color: var(--green); }
-  .option.picked.correct .option-dot svg{ opacity: 1; transform: scale(1); }
-
-  .option.picked.wrong{
-    background: var(--red-soft); border-color: var(--red);
-  }
-  .option.picked.wrong .option-dot{ background: var(--red); border-color: var(--red); }
-  .option.picked.wrong .option-dot svg{ opacity: 1; transform: scale(1); }
-
-  .option.reveal.correct:not(.picked){
-    border-color: var(--green);
-    background: var(--green-soft);
-  }
-
-  .qcard.locked .option{ pointer-events: none; }
-
-  /* Result section */
-  .result{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    padding: 32px 28px;
-    margin-top: 8px;
-    margin-bottom: 24px;
-    opacity: 0; transform: translateY(14px);
-    max-height: 0; overflow: hidden;
-    transition: opacity 0.5s cubic-bezier(.16,1,.3,1), transform 0.5s cubic-bezier(.16,1,.3,1), max-height 0.5s cubic-bezier(.16,1,.3,1);
-  }
-  .result.visible{ opacity: 1; transform: translateY(0); max-height: 600px; }
-
-  .result-top{ display:flex; align-items:center; gap: 22px; margin-bottom: 22px; }
-  .ring-wrap{ position: relative; flex: none; width: 84px; height: 84px; }
-  .ring-wrap svg{ width: 84px; height: 84px; transform: rotate(-90deg); }
-  .ring-bg{ fill: none; stroke: var(--line); stroke-width: 8; }
-  .ring-fg{
-    fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round;
-    stroke-dasharray: 219.9; stroke-dashoffset: 219.9;
-    transition: stroke-dashoffset 0.7s cubic-bezier(.16,1,.3,1) 0.2s, stroke 0.4s ease;
-  }
-  .ring-center{ position: absolute; inset: 0; display:flex; align-items:center; justify-content:center; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
-
-  .result-heading{ font-size: 13px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 4px; }
-  .result-score{ font-size: 15px; color: var(--ink-soft); margin: 0; }
-  .result-score b{ color: var(--ink); font-weight: 800; font-size: 17px; }
-
-  .badge{
-    display:inline-flex; align-items:center; gap: 8px;
-    font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; margin-bottom: 14px;
-  }
-  .badge.green{ background: var(--green-soft); color: var(--green); }
-  .badge.amber{ background: #FDF4E1; color: #8A6100; }
-  .badge.red{ background: var(--red-soft); color: var(--red); }
-
-  .result-title{ font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px; }
-  .result-text{ font-size: 15px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 20px; }
-
-  .retry-btn{
-    display:inline-flex; align-items:center; gap:8px;
-    background: var(--ink); color: #fff;
-    border: none; border-radius: 12px;
-    padding: 12px 20px;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.15s ease, opacity 0.15s ease;
-  }
-  .retry-btn:hover{ transform: translateY(-1px); opacity: 0.9; }
-
-  footer{ text-align:center; font-size: 12.5px; color: #B4B4BC; margin-top: 32px; }
-
-  @keyframes dropIn{ from{ opacity:0; transform: translateY(-8px); } to{ opacity:1; transform: translateY(0); } }
-  @media (max-width: 480px){ h1{ font-size: 26px; } .result-top{ flex-direction: column; align-items:flex-start; } }
-  @media (prefers-reduced-motion: reduce){ *{ animation: none !important; transition: none !important; } }
+:root{--ink:#0d1015;--panel:#15191e;--panel2:#1b2025;--warm:#eee5d5;--muted:#afa898;--gold:#cfaf7c;--gold-soft:#9a815f;--red:#a94c4b;--line:#64554055;--teal:#9ac9ad;--yellow:#edce83;--glow:#d5ae6c38;--radius:16px;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:var(--ink);color:var(--warm);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body:before{position:fixed;inset:0;content:"";pointer-events:none;opacity:.22;background-image:radial-gradient(circle at 15% 15%,#a57c4c10 0%,transparent 35%),radial-gradient(circle at 75% 90%,#6a1d2d13 0%,transparent 30%),repeating-linear-gradient(0deg,transparent,transparent 3px,#ffffff05 4px);z-index:0}
+::selection{background:#bfa071;color:#0f1116}
+a{color:var(--gold)}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.43}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.wrap{position:relative;z-index:1;max-width:1040px;margin:auto;padding:24px 20px 85px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0 18px;border-bottom:1px solid var(--line)}
+.logo{font-size:11px;font-weight:800;letter-spacing:.27em;color:var(--gold);line-height:1.4}
+.top-right{font-size:10px;letter-spacing:.11em;color:var(--muted);white-space:nowrap}
+.layout{display:grid;grid-template-columns:minmax(230px,.84fr) minmax(0,1.35fr);gap:clamp(22px,5vw,70px);align-items:start;padding-top:clamp(28px,5vw,60px)}
+.aside{position:sticky;top:35px;padding-top:20px}
+.constellation{position:relative;height:210px;margin-bottom:24px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.constellation::before{content:"";position:absolute;border:1px solid #b99a674d;width:190px;height:190px;border-radius:50%;box-shadow:0 0 90px #c09c3220,inset 0 0 65px #9c774c14;transform:rotate(-20deg)}
+.constellation::after{content:"";position:absolute;border:1px dashed #d1a45e45;width:160px;height:160px;border-radius:50%}
+.sigil{font-family:Georgia,"Times New Roman",serif;font-size:112px;color:#c8a676;text-shadow:0 0 25px #c9a36936;transform:rotate(-9deg);line-height:1}
+.cross{position:absolute;font-size:11px;color:#c6a477;opacity:.8}.one{top:11px;left:23%}.two{right:22%;top:38px}.three{bottom:12px;right:25%}
+.eyebrow{font-size:10px;font-weight:750;letter-spacing:.26em;text-transform:uppercase;color:var(--gold)}
+.aside h1{font:normal clamp(38px,5.2vw,67px)/.96 Georgia,"Times New Roman",serif;letter-spacing:.035em;margin:12px 0 16px;text-transform:uppercase}
+.aside h1 span{display:block;color:var(--gold)}
+.aside p{color:var(--muted);font-size:14px;max-width:270px}
+.edition{margin-top:22px;border-left:2px solid var(--gold-soft);padding-left:13px;line-height:1.4;font-size:11px;color:#8e8d83;letter-spacing:.09em}
+.shell{border:1px solid var(--line);background:linear-gradient(145deg,#1b1e22,#13171c 66%);box-shadow:0 32px 90px #0008, inset 0 1px #e4b87715;border-radius:20px;overflow:hidden;min-height:550px;position:relative}
+.shell:before{content:"";position:absolute;top:6px;right:8px;bottom:6px;left:8px;pointer-events:none;border:1px solid #e2b4780c;border-radius:14px}
+.shell-head{padding:21px 25px 19px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#ad855112,transparent);position:relative}
+.shell-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;color:var(--gold);letter-spacing:.15em;font-weight:750}
+.progress{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:14px}
+.progress span{background:#63574947;height:3px;border-radius:5px;transition:background .2s}
+.progress span.done{background:var(--gold)}
+.content{padding:clamp(22px,4vw,35px);position:relative;animation:appear .28s ease both}
+@keyframes appear{from{opacity:.4;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--gold);font-weight:750;margin:0 0 7px}
+.kicker:before{content:"◆";font-size:8px}
+h2{font:normal clamp(28px,3vw,38px)/1.16 Georgia,"Times New Roman",serif;letter-spacing:-.015em;margin:8px 0 19px}
+h3{font:normal 22px/1.2 Georgia,"Times New Roman",serif;color:var(--warm);margin:0 0 12px}
+.lead{font:normal clamp(18px,2.3vw,22px)/1.5 Georgia,"Times New Roman",serif;color:#e7d7bd}
+p{margin:0 0 17px}.muted{color:var(--muted)}.riddle{font-size:14px;line-height:1.83;color:#d7d0c3}
+.statement{margin:20px 0;padding:14px 18px;border-left:2px solid var(--gold);background:#b88b4b09;font:normal 19px/1.45 Georgia,serif;color:#efd8a9}
+.clue{margin:13px 0;padding:19px 19px 15px;border:1px solid #b5986b3a;border-radius:12px;background:#ffffff05}
+.clue .num{font-size:9px;letter-spacing:.19em;text-transform:uppercase;color:var(--gold);font-weight:750;margin-bottom:7px}
+.clue p:last-child{margin-bottom:0}
+.sep{display:flex;align-items:center;gap:12px;margin:26px 0 23px;color:#ab8b5d}.sep:before,.sep:after{content:"";height:1px;background:var(--line);flex:1}
+.note{font-family:Georgia,serif;font-style:italic;font-size:15px;line-height:1.5;color:#ab9a7f;margin-top:21px}
+.proof{padding:17px 18px;border:1px solid #b7a07065;background:#b0946020;border-radius:12px;margin-top:29px}
+.proof-title{display:flex;align-items:center;gap:9px;color:#ecd1a2;font-size:10px;font-weight:850;letter-spacing:.15em;margin-bottom:9px}.proof-title b{font-size:17px}
+.proof p{font-size:12px;line-height:1.75;color:#e1d6c2;margin-bottom:11px}.proof small{color:#a5a192;display:block;line-height:1.55}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:9px;min-height:49px;border:1px solid #a98756;border-radius:8px;padding:12px 16px;background:var(--gold);color:#14161a;font-size:11px;font-weight:850;letter-spacing:.11em;text-transform:uppercase;text-decoration:none;transition:transform .15s,background .15s;max-width:100%;text-align:center}
+.btn:active{transform:translateY(1px)}.btn:hover:not(:disabled){background:#e1c493;color:#10131a}
+.btn.secondary{background:transparent;color:var(--gold);border-color:#af956e80}.btn.secondary:hover:not(:disabled){background:#b49a6a21;color:var(--warm)}
+.btn.quiet{background:#30303938;border-color:#97856c3d;color:#cdc3ae}.btn.full{width:100%}.btn.small{min-height:38px;font-size:10px;letter-spacing:.05em;padding:9px 12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.actions>*{flex:1}
+.form{margin-top:26px;padding:20px;border:1px solid var(--line);border-radius:13px;background:#0f1216a8}
+.form label{display:block;color:#dac7aa;font-size:12px;font-weight:750;letter-spacing:.04em;margin-bottom:13px}
+.code-input{width:100%;border:1px solid #8b774d;background:#181c21;border-radius:8px;color:var(--warm);font-size:34px;letter-spacing:.48em;text-indent:.48em;font-weight:550;text-align:center;min-height:66px;margin-bottom:12px;font-variant-numeric:tabular-nums}
+.code-input::placeholder{color:#716f66;letter-spacing:.48em}
+.input-plain{width:100%;border:1px solid #9b825463;border-radius:8px;background:#10151a;color:var(--warm);padding:15px;min-height:48px;font-size:15px}
+.form .hint{font-size:11px;color:var(--muted);margin:8px 0 12px}
+.counter{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:11px;color:#bdad90;margin:0 0 13px}.counter strong{color:var(--gold);font-variant-numeric:tabular-nums}
+.feedback{min-height:20px;font-size:12px;line-height:1.5;color:#ecb4a7;margin-top:11px}.feedback.good{color:var(--teal)}
+.lock{padding:17px;background:#7e36352b;border:1px solid #bb585a55;color:#ecd3c5;border-radius:9px;margin:12px 0 0;text-align:center;font-size:12px}
+.coords{border:1px solid var(--line);background:#0d1217;padding:19px 16px;border-radius:13px;margin:20px 0}
+.coords-line{font-size:clamp(19px,3.6vw,28px);font-weight:700;letter-spacing:.01em;white-space:nowrap;color:#e8dfce;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:2px;margin:13px 0}
+.coords-label{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#a79d8b;margin-top:6px}
+.slot{width:28px;height:38px;min-width:25px;padding:0;background:#27292d;border:1px solid #cfb379;border-radius:5px;color:var(--yellow);text-align:center;font-size:24px;font-weight:750;line-height:34px;font-variant-numeric:tabular-nums;outline-offset:1px}
+.slot.green{border-color:#659f85;color:#a6d5b3;background:#142821}.slot.yellow{border-color:#bd9952;color:#eed180;background:#302716}
+.slot:focus{background:#3b3021;border-width:2px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip{font-size:11px;padding:6px 9px;border:1px solid;border-radius:5px;font-variant-numeric:tabular-nums}
+.chip.yellow{color:var(--yellow);border-color:#d6bd7157;background:#c3a74812}.chip.green{color:var(--teal);border-color:#81b7a052;background:#74bba214}
+.box-message{border:1px solid #a6894c64;background:linear-gradient(120deg,#d5ae6c12,#5c201c0c);border-radius:12px;padding:23px;text-align:center;margin:24px 0}
+.box-message .big{font:normal 32px Georgia,serif;letter-spacing:.06em;color:var(--gold);margin:8px 0}
+.map-coord{text-align:center;padding:23px 15px;margin:25px 0;border:1px solid #c7a46655;background:#bf955911;border-radius:12px}
+.map-coord .digits{font-size:clamp(20px,4vw,27px);font-weight:600;color:#f2deb7;letter-spacing:.03em;word-break:break-word}
+.reward{width:192px;height:192px;max-width:90%;border:1px solid #cea76b80;box-shadow:0 0 80px #bf884630,inset 0 0 40px #ac85431c;margin:23px auto;display:grid;place-items:center;border-radius:50%;position:relative}
+.reward:after{content:"";position:absolute;inset:17px;border:1px dashed #d6b97871;border-radius:50%}
+.reward .word{font:normal 41px Georgia,serif;letter-spacing:.1em;color:var(--gold)}
+.foot-nav{border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;padding:16px 22px;color:#9b9285;font-size:11px}
+.navbtn{border:0;background:transparent;color:#d2b48e;padding:7px;font-size:11px;min-height:37px}
+.testpanel{border:1px solid #91654e80;border-radius:11px;padding:15px;background:#7d402c19;margin-top:22px}
+.testpanel summary{cursor:pointer;font-size:11px;letter-spacing:.1em;color:#d5a889;font-weight:700}.testpanel ul{padding-left:18px;font-size:12px;color:#d8bdad}
+.site-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#77786e;font-size:10px;letter-spacing:.04em;padding-top:20px}.site-foot button{background:transparent;border:0;color:#9d8a6b;font-size:10px;text-decoration:underline}
+.welcome-art{border:1px solid var(--line);background:#bda46d0b;padding:17px;text-align:center;margin:25px 0;font:normal 29px Georgia,serif;letter-spacing:.3em;color:#bc9c73}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,120px);z-index:20;border:1px solid #ad936b;background:#262922;color:var(--warm);padding:13px 20px;max-width:90vw;border-radius:9px;box-shadow:0 14px 35px #0009;transition:transform .25s;font-size:13px;text-align:center;pointer-events:none}.toast.show{transform:translate(-50%,0)}
+@media(max-width:800px){.wrap{padding:14px 14px 60px}.top{padding-bottom:12px}.layout{grid-template-columns:1fr;gap:0;padding-top:12px}.aside{position:relative;padding:4px 7px 18px;display:grid;grid-template-columns:1fr 114px;align-items:center;column-gap:12px}.constellation{order:2;height:110px;margin:0;grid-column:2;grid-row:1/5}.constellation:before{width:106px;height:106px}.constellation:after{width:87px;height:87px}.sigil{font-size:63px}.cross{font-size:7px}.aside .eyebrow{grid-column:1;grid-row:1;align-self:end}.aside h1{font-size:clamp(31px,9vw,51px);grid-column:1;grid-row:2;margin:6px 0 10px}.aside p{grid-column:1;grid-row:3;max-width:100%;margin:0;font-size:12px}.edition{display:none}.shell{min-height:420px}.content{padding:22px 19px}.shell-head{padding:17px 19px}.foot-nav{padding:12px 13px}}
+@media(max-width:390px){.coords-line{font-size:18px}.slot{width:23px;min-width:22px;height:34px;font-size:20px}.logo{font-size:10px}.top-right{font-size:9px}.actions{flex-direction:column}.aside{grid-template-columns:1fr 84px}.constellation{height:95px}.constellation:before{width:91px;height:91px}.constellation:after{width:74px;height:74px}.sigil{font-size:52px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
-
-<div class="bg-glow"></div>
-
-<div class="shell">
-
-  <div class="progress-wrap">
-    <span class="progress-label">Отвечено <b id="progressCount">0</b> / <span id="totalCount">5</span></span>
-    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-  </div>
-
-  <header>
-    <span class="eyebrow">Тест для подруг · 2 минуты</span>
-    <h1>Насколько хорошо ты меня знаешь?</h1>
-    <p class="subtitle">Выбирай вариант в каждом вопросе — правильный ответ подсветится сразу, а в конце увидишь итоговый результат.</p>
-  </header>
-
-  <div id="quiz"></div>
-
-  <div class="result" id="result">
-    <div class="result-top">
-      <div class="ring-wrap">
-        <svg viewBox="0 0 84 84">
-          <circle class="ring-bg" cx="42" cy="42" r="35"></circle>
-          <circle class="ring-fg" id="ringFg" cx="42" cy="42" r="35"></circle>
-        </svg>
-        <div class="ring-center" id="ringCenter">0</div>
-      </div>
-      <div>
-        <p class="result-heading">Итоговый результат</p>
-        <p class="result-score"><b id="scoreValue">0</b> из <span id="scoreTotal">5</span></p>
-      </div>
-    </div>
-
-    <div id="badgeWrap"></div>
-    <h2 class="result-title" id="resultTitle"></h2>
-    <p class="result-text" id="resultText"></p>
-
-    <button class="retry-btn" id="retryBtn">Пройти ещё раз</button>
-  </div>
-
-  <footer>Сделано с любовью — для тех, кто правда меня знает 💜</footer>
-
-</div>
-
+<div class="wrap"><header class="top"><div class="logo">PROSTRANSTVO <span aria-hidden="true">×</span> АТЛАС ТЕНЕЙ</div><div class="top-right">31.10.2026 · ПРОТОТИП</div></header>
+<div class="layout">
+<aside class="aside" aria-label="Оформление Атласа"><div class="constellation" aria-hidden="true"><span class="cross one">✦</span><span class="cross two">✧</span><span class="sigil">✥</span><span class="cross three">✳</span></div><div class="eyebrow">Охота по Нячангу</div><h1>АТЛАС <span>ТЕНЕЙ</span></h1><p>Город хранит то, что люди забыли. Но не каждый след ведёт туда, куда обещает проводник.</p><div class="edition">PROSTRANSTVO · НОЧНОЙ АРХИВ<br>ПЕЧАТЬ I / 03</div></aside>
+<main class="shell" id="app"><div class="shell-head"><div class="shell-title"><span id="page-label">НУЛЕВОЙ ЛИСТ</span><span id="page-count">НАЧАЛО</span></div><div id="progress" class="progress" aria-label="Прогресс прохождения"></div></div><div id="content" class="content" aria-live="polite"></div><nav id="foot-nav" class="foot-nav"></nav></main>
+</div><footer class="site-foot"><span>Тестовая версия · Не для реального зачёта</span><button id="toggle-demo">Режим тестирования</button></footer></div><div class="toast" id="toast" role="status"></div>
 <script>
-  const questions = [
-    {
-      text: "Как меня зовут по-настоящему (полное имя)?",
-      options: [
-        "Идиятуллина Диляра Илдаровна",
-        "Идиятуллина Диляра Ильнаровна",
-        "Идиатуллина Диляра Ильшатовна",
-        "Идиятуллина Диляра Ириковна"
-      ],
-      correct: 0
-    },
-    {
-      text: "В каком городе я родилась?",
-      options: ["Альметьевск", "Москва", "Казань", "Дубай"],
-      correct: 2
-    },
-    {
-      text: "Кем я мечтала стать в детстве?",
-      options: ["Учителем", "Актрисой", "Врачом", "Певицой"],
-      correct: 1
-    },
-    {
-      text: "Моя любимая еда?",
-      options: ["Картошка", "Гречка", "Хлеб", "Мясо"],
-      correct: 0
-    },
-    {
-      text: "Моя главная слабость?",
-      options: ["Шоколад", "Шоппинг", "Сериалы", "ChatGPT"],
-      correct: 2
-    }
-  ];
-
-  const total = questions.length;
-  const answers = new Array(total).fill(null);
-
-  const quizEl = document.getElementById('quiz');
-  const progressFill = document.getElementById('progressFill');
-  const progressCount = document.getElementById('progressCount');
-  document.getElementById('totalCount').textContent = total;
-  document.getElementById('scoreTotal').textContent = total;
-
-  const checkIcon = `<svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  const crossIcon = `<svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
-
-  function renderQuiz(){
-    quizEl.innerHTML = '';
-    questions.forEach((q, qi) => {
-      const card = document.createElement('div');
-      card.className = 'qcard';
-      card.dataset.index = qi;
-
-      const optionsHtml = q.options.map((opt, oi) => `
-        <div class="option" data-oi="${oi}">
-          <span class="option-dot"></span>
-          <span>${opt}</span>
-        </div>
-      `).join('');
-
-      card.innerHTML = `
-        <div class="qhead">
-          <span class="qnum">${qi + 1}</span>
-          <span class="qtext">${q.text}</span>
-        </div>
-        <div class="options">${optionsHtml}</div>
-      `;
-
-      card.querySelectorAll('.option').forEach(opt => {
-        opt.addEventListener('click', () => selectAnswer(qi, Number(opt.dataset.oi)));
-      });
-
-      quizEl.appendChild(card);
-    });
-  }
-
-  function selectAnswer(qi, oi){
-    if(answers[qi] !== null) return;
-    answers[qi] = oi;
-
-    const card = quizEl.querySelector(`.qcard[data-index="${qi}"]`);
-    card.classList.add('locked');
-
-    const q = questions[qi];
-    card.querySelectorAll('.option').forEach((el, i) => {
-      if(i === oi) el.classList.add('picked');
-      if(i === q.correct){
-        el.classList.add('correct');
-        el.querySelector('.option-dot').innerHTML = checkIcon;
-      } else if(i === oi){
-        el.classList.add('wrong');
-        el.querySelector('.option-dot').innerHTML = crossIcon;
-      }
-    });
-
-    update();
-  }
-
-  const RING_CIRC = 219.9;
-  const resultBox = document.getElementById('result');
-  const scoreValue = document.getElementById('scoreValue');
-  const ringFg = document.getElementById('ringFg');
-  const ringCenter = document.getElementById('ringCenter');
-  const badgeWrap = document.getElementById('badgeWrap');
-  const resultTitle = document.getElementById('resultTitle');
-  const resultText = document.getElementById('resultText');
-
-  const tiers = [
-    {
-      min: 0, max: 1, cls: 'red', icon: '🔴',
-      label: 'Есть куда расти',
-      color: 'var(--red)',
-      title: 'Нам явно нужно больше созваниваться',
-      text: 'Пора устроить вечер вопросов и разговоров по душам — обещаю, будет что обсудить.'
-    },
-    {
-      min: 2, max: 3, cls: 'amber', icon: '🟡',
-      label: 'Неплохо, но не всё',
-      color: 'var(--amber, #E5A100)',
-      title: 'Ты знаешь меня довольно хорошо',
-      text: 'Основное точно уловила, но пара деталей всё же ускользнула. Расскажу лично — при встрече.'
-    },
-    {
-      min: 4, max: 5, cls: 'green', icon: '🟢',
-      label: 'Знаешь меня отлично',
-      color: 'var(--green)',
-      title: 'Ты знаешь меня как облупленную',
-      text: 'Настоящая подруга! Ты точно из тех, кому можно доверить все секреты.'
-    }
-  ];
-
-  function getTier(score){
-    return tiers.find(t => score >= t.min && score <= t.max);
-  }
-
-  function update(){
-    const answeredCount = answers.filter(a => a !== null).length;
-    progressCount.textContent = answeredCount;
-    progressFill.style.width = (answeredCount / total * 100) + '%';
-
-    if(answeredCount < total){
-      resultBox.classList.remove('visible');
-      return;
-    }
-
-    const score = questions.reduce((acc, q, i) => acc + (answers[i] === q.correct ? 1 : 0), 0);
-    const tier = getTier(score);
-
-    scoreValue.textContent = score;
-    ringCenter.textContent = score;
-    ringFg.style.stroke = tier.color;
-    ringFg.style.strokeDashoffset = RING_CIRC - (RING_CIRC * score / total);
-
-    badgeWrap.innerHTML = `<span class="badge ${tier.cls}">${tier.icon} ${tier.label}</span>`;
-    resultTitle.textContent = tier.title;
-    resultText.textContent = tier.text;
-
-    resultBox.classList.add('visible');
-  }
-
-  document.getElementById('retryBtn').addEventListener('click', () => {
-    for(let i = 0; i < total; i++) answers[i] = null;
-    resultBox.classList.remove('visible');
-    renderQuiz();
-    progressCount.textContent = 0;
-    progressFill.style.width = '0%';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
-  renderQuiz();
+(()=>{'use strict';
+const KEY='atlas-teney-i-html-v1';
+const defaultState=()=>({current:0,unlocked:0,team:'',attempts:{},coord:{},completed:{}});
+let state;try{state=Object.assign(defaultState(),JSON.parse(localStorage.getItem(KEY)||'{}'))}catch{state=defaultState()}
+let demo=new URLSearchParams(location.search).get('demo')==='1';
+let countdownTimer;
+const $=sel=>document.querySelector(sel);
+const esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch{}};
+const attemptState=k=>{state.attempts??={};state.attempts[k]??={wrong:0,until:0};return state.attempts[k]};
+const minutes=s=>`${String(Math.floor(Math.max(0,s)/60)).padStart(2,'0')}:${String(Math.max(0,s)%60).padStart(2,'0')}`;
+function locked(k){const a=attemptState(k);if(a.until && Date.now()>=a.until){a.until=0;a.wrong=0;save()}return a.until>Date.now()}
+const toPage=n=>{if(n>state.unlocked||n<0)return;state.current=n;save();render();scrollTo({top:0,behavior:'smooth'})};
+function unlock(n){state.unlocked=Math.max(state.unlocked,n);state.current=n;save();render();scrollTo({top:0,behavior:'smooth'});toast('Новый лист Атласа открыт')}
+function toast(text){const el=$('#toast');el.textContent=text;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2500)}
+async function copy(text){try{await navigator.clipboard.writeText(text);toast('Скопировано')}catch{const input=document.createElement('textarea');input.value=text;document.body.appendChild(input);input.select();try{document.execCommand('copy');toast('Скопировано')}catch{toast('Выделите и скопируйте текст вручную')}input.remove()}}
+const intro=()=>`<span class="kicker">Нулевой лист · Пробуждение</span><h2>Книга, которая помнит дороги</h2><p class="lead">Когда город засыпает, некоторые его знаки начинают говорить.</p><p class="riddle">Перед вами первая печать Атласа. Чтобы найти её, вам придётся исследовать город, восстановить утраченные числа и обнаружить знак, спрятанный от случайных прохожих.</p><div class="welcome-art" aria-hidden="true">✦ &nbsp; I &nbsp; ✦</div><p class="muted" style="font-size:13px">Не закрывайте Атлас раньше времени. Он сохранит уже открытые страницы на этом устройстве.</p><div class="form"><label for="team">Название команды <span class="muted">(необязательно)</span></label><input class="input-plain" id="team" maxlength="50" autocomplete="off" placeholder="Например, Хранители ночи" value="${esc(state.team)}"><div style="height:15px"></div><button class="btn full" id="start">ОТКРЫТЬ АТЛАС <span aria-hidden="true">✧</span></button></div><p class="note">Не всякое важное сообщение будет выглядеть как задание.</p>`;
+const proof=(desc,copied)=>`<div class="proof"><div class="proof-title"><b>▣</b> ПОДТВЕРДИТЕ НАХОДКУ</div><p>${desc}</p><p><strong>Без фотографий задание не засчитывается.</strong> Отправьте их Куратору в командный Telegram-чат. Продолжать игру можно, пока организаторы проверяют снимки.</p><button class="btn secondary small" data-copy="${esc(copied)}">СКОПИРОВАТЬ СПИСОК ФОТО</button><small>Командный чат выдаёт организатор. В демо сайт сам не принимает и не проверяет фото.</small></div>`;
+const codeform=(stage)=>{const remaining=3-attemptState(stage).wrong;return `<div class="form" id="form-${stage}"><label for="answer-${stage}">Введите три числа в порядке загадок</label><input id="answer-${stage}" class="code-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="3" aria-label="Трёхзначный код" placeholder="•••" ${locked(stage)?'disabled':''}><div class="counter"><span>Попытки для этого листа</span><strong class="attempts-label">${remaining} из 3</strong></div><button id="verify-${stage}" class="btn full" ${locked(stage)?'disabled':''}>ПРОВЕРИТЬ ЗНАКИ</button><div class="feedback" id="feedback-${stage}" role="status"></div><div class="lock" id="lock-${stage}" ${locked(stage)?'':'hidden'}></div></div>`};
+const first=()=>`<span class="kicker">Печать I · Часть I</span><h2>По следам забытых знаков</h2><p class="riddle">Когда-то эти земли принадлежали тем, чьи имена давно стёрло время. Но камень помнит больше, чем люди.</p><p class="riddle">Найдите древние башни из красного кирпича, возвышающиеся над городом. Не ищите ответ внутри. То, что вам нужно, осталось за их пределами.</p><p class="riddle">Неподалёку дорога раздваивается, словно змеиный язык. Выберите левый путь и следуйте по узкой улице.</p><div class="statement">Три знака. Три числа. Один путь.</div><div class="clue"><div class="num">Первый знак — по правую руку</div><p class="riddle">Здесь ветер обрёл власть над цветными крыльями. Он заставляет их кружиться, но не может унести с собой.</p><p class="riddle"><strong>Сколько пленников у ветра?</strong></p></div><div class="clue"><div class="num">Второй знак — по левую руку</div><p class="riddle">Там, где люди ищут исцеления, скрывается древний символ единства.</p><p class="riddle">Он родился из соперничества, но стал знаком мира. Его части неразрывны, хотя каждая существует отдельно.</p><p class="riddle"><strong>Сколько фигур образуют этот союз?</strong></p></div><div class="clue"><div class="num">Третий знак — снова справа</div><p class="riddle">Найдите сад, в котором кувшинки никогда не касались воды.</p><p class="riddle">Напротив него поднимите взгляд.</p><p class="riddle">Там застыли молчаливые стражи. Они видели тысячи прохожих, но ни разу не покинули своего поста.</p><p class="riddle"><strong>Сколько стражей охраняют вечный сад?</strong></p></div><div class="sep">✥</div><p class="riddle">Теперь у вас есть три числа.</p><p class="riddle">Запишите их в порядке встречи и передайте Атласу.</p><p class="riddle">Это лишь первая часть координат. Сохраните все найденные числа — каждое из них ещё сыграет свою роль.</p><p class="note">Не всякий, кто находит путь, понимает, куда он ведёт.</p>${proof('Сделайте фотографии всех трёх объектов: цветные ветряки, символ единства возле аптеки, молчаливые стражи.','Печать I — часть I. Фото: 1) цветные ветряки; 2) символ единства возле аптеки; 3) молчаливые стражи.')}${codeform('code1')}`;
+const second=()=>`<span class="kicker">Печать I · Часть II</span><h2>Сад ложных знаков</h2><p class="riddle">Первую часть пути вы восстановили. Но Атлас всё ещё скрывает место, где покоится печать.</p><p class="riddle">Вторая строка ждёт там, где странники отправляются в дальний путь.</p><p class="riddle">Неподалёку от остановки есть небольшой зелёный остров. Напротив него птица мира обрела пристанище. Она не летает и не поёт — её имя на чужом языке носит дом, принимающий путешественников.</p><p class="riddle"><strong>Найдите это место.</strong></p><p class="riddle">Здесь город оставил множество знаков. Но лишь три из них принадлежат Атласу.</p><div class="clue"><div class="num">Первый знак — в имени</div><p class="riddle">Некоторые дни исчезают из памяти. Другие остаются на картах навсегда.</p><p class="riddle">Найдите дату, ставшую названием улицы. Сложите числа — так вы получите первое число.</p></div><div class="clue"><div class="num">Второй знак — за оградой</div><p class="riddle">Прямые линии складываются в острые углы. Но среди них скрыты другие фигуры — замкнутые, без начала и конца.</p><p class="riddle">Отыщите их и сосчитайте.</p></div><div class="clue"><div class="num">Третий знак — перед чужими историями</div><p class="riddle">Синий хранитель собрал образы мест, которые видели тысячи людей.</p><p class="riddle">Но ваш знак не среди изображений.</p><p class="riddle">Перед ним стоит тот, кто разгоняет ночную тьму. Он молчит, но носит на себе число.</p><p class="riddle">Найдите его.</p></div><div class="sep">✥</div><p class="riddle"><strong>Три знака. Три числа.</strong></p><p class="riddle">Введите их в Атлас в порядке загадок.</p><p class="riddle">Теперь вернитесь к первой части пути. Все найденные числа понадобятся вам, чтобы восстановить координаты.</p><p class="note">Не всякая дорога ведёт туда, куда обещает проводник.</p>${proof('Отправьте фотографии трёх находок: название улицы с датой, замкнутые фигуры на фасаде за оградой, число на фонарном столбе перед синим стендом.','Печать I — часть II. Фото: 1) название улицы с датой; 2) замкнутые фигуры на фасаде; 3) номер на фонарном столбе перед синим стендом.')}${codeform('code2')}`;
+const slot=(id,color)=>`<input class="slot ${color}" data-slot="${id}" inputmode="numeric" pattern="[0-9]*" maxlength="1" value="${esc(state.coord?.[id]||'')}" aria-label="Цифра ${id}">`;
+const coords=()=>`<span class="kicker">Печать I · Лист III</span><h2>Восстановление координат</h2><p class="lead">Шесть знаков — одна точка.</p><p class="riddle">Вы нашли две части старой карты. Теперь Атлас требует соединить их. Каждое число должно занять своё место в строках.</p><div class="legend"><span class="chip yellow">Первая часть: 4 · 5 · 2</span><span class="chip green">Вторая часть: 6 · 8 · 3</span></div><div class="coords" role="group" aria-label="Сборка координат"><div class="coords-label">Широта</div><div class="coords-line"><span>12.2</span>${slot('G1','green')}${slot('G2','green')}${slot('Y1','yellow')}<span>1</span>${slot('G3','green')}</div><div class="coords-label">Долгота</div><div class="coords-line"><span>109.</span>${slot('Y3','yellow')}<span>0</span>${slot('Y2','yellow')}<span>364</span></div></div><p class="riddle">Жёлтые пропуски заполняются знаками с первого пути. Зелёные — со второго. Используйте числа в том порядке, в каком нашли их: жёлтые №1, №2, №3 и зелёные №1, №2, №3.</p><div class="form" id="form-coords"><label>Когда обе строки станут целыми, проверьте их</label><div class="counter"><span>Попытки для этого листа</span><strong class="attempts-label">${3-attemptState('coords').wrong} из 3</strong></div><button class="btn full" id="verify-coords" ${locked('coords')?'disabled':''}>ВОССТАНОВИТЬ МАРШРУТ</button><div class="feedback" id="feedback-coords" role="status"></div><div class="lock" id="lock-coords" ${locked('coords')?'':'hidden'}></div></div><p class="muted" style="font-size:11px;margin-top:12px">Это рабочая маска прототипа. Перед реальной игрой необходимо утвердить расположение цветных пропусков.</p>`;
+const last=()=>`<span class="kicker">Печать I · Лист IV</span><h2>Последний след</h2><p class="lead">Координаты восстановлены.</p><p class="riddle">Вы собрали разрозненные числа и вернули Атласу утраченную часть карты.</p><p class="riddle">Теперь он знает, куда вас направить.</p><div class="map-coord"><div class="eyebrow">Место, обозначенное Атласом</div><div class="digits">12.268413, 109.205364</div></div><p class="riddle">Но не спешите считать, что цель достигнута.</p><p class="riddle">Там, куда ведут координаты, ваш путь только начинается.</p><p class="riddle">Поднимитесь выше. Оставьте город внизу и ищите знак, который не принадлежит этому месту.</p><p class="riddle">Он не похож на древние письмена. Чёрные и белые квадраты скрывают послание, которое можно прочесть лишь с помощью телефона.</p><p class="riddle">Только тогда первая печать откроет вам свой фрагмент.</p><div class="actions"><a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=12.268413%2C109.205364" target="_blank" rel="noopener noreferrer">ОТКРЫТЬ В КАРТАХ ↗</a><button class="btn secondary" data-copy="12.268413, 109.205364">СКОПИРОВАТЬ</button></div>${proof('Найдите QR-код, отсканируйте его и отправьте Куратору фотографию знака на месте. Захватите в кадр часть окружения.','Печать I — последний след. Фото: QR-код на месте с частью окружающего пространства.') }<div class="form"><label>Тестирование QR-кода</label><p class="hint">Настоящий QR-код ещё не размещён. Кнопка ниже имитирует сканирование только для проверки прототипа.</p><button class="btn full" id="simulate-qr">◈ СИМУЛИРОВАТЬ QR-СКАНИРОВАНИЕ</button></div>`;
+const reward=()=>`<span class="kicker">Печать I · Лист V</span><h2>Печать найдена</h2><p class="lead">Первый фрагмент Атласа открыт.</p><div class="reward" aria-label="Фрагмент: ТЕНЬ"><span class="word">ТЕНЬ</span></div><p class="riddle">Один знак у нас есть. Отличная работа. Запомните его метку: в Атласе ничего не возникает случайно.</p><p class="riddle">Я отправляю вам следующий след. Не задерживайтесь — время работает против нас.</p><div class="proof"><div class="proof-title"><b>✧</b> СОХРАНИТЕ ФРАГМЕНТ</div><p>Отправьте Куратору подтверждения находок. Следующую печать вашей команде выдаст Куратор в Telegram.</p><button class="btn secondary small" data-copy="Печать I: ТЕНЬ">СКОПИРОВАТЬ ФРАГМЕНТ</button></div><div class="actions"><button class="btn quiet" id="reset-inside">НАЧАТЬ ТЕСТ ЗАНОВО</button></div>`;
+const pages=[intro,first,second,coords,last,reward];
+const pageNames=['Нулевой лист','Следы забытых знаков','Сад ложных знаков','Восстановление координат','Последний след','Фрагмент печати'];
+function attempt(key,correct,onSuccess){if(locked(key))return;const a=attemptState(key);if(correct){state.completed[key]=true;save();onSuccess();return}a.wrong++;if(a.wrong>=3)a.until=Date.now()+120000;save();renderAttempt(key);const f=$(`#feedback-${key}`);if(f){f.textContent=a.wrong>=3?'Три неверных ответа. Атлас временно закрылся.':'Атлас не узнаёт эти знаки. Проверьте находки.'} }
+function renderAttempt(key){const a=attemptState(key);const isLocked=locked(key);const f=$(`#form-${key}`);if(!f)return;f.querySelector('.attempts-label').textContent=`${Math.max(0,3-a.wrong)} из 3`;const lockBox=$(`#lock-${key}`);if(lockBox){lockBox.hidden=!isLocked;if(isLocked)lockBox.textContent=`Атлас закрыт на ${minutes(Math.ceil((a.until-Date.now())/1000))}. После паузы откроются ещё три попытки.`}const btn=$(`#verify-${key}`);if(btn)btn.disabled=isLocked;const inp=$(`#answer-${key}`);if(inp)inp.disabled=isLocked;f.querySelectorAll('[data-slot]').forEach(el=>el.disabled=isLocked)}
+function render(){clearInterval(countdownTimer);const n=Math.min(state.current,state.unlocked,5);state.current=n;$('#page-label').textContent=n===0?'НУЛЕВОЙ ЛИСТ':`ПЕЧАТЬ I · ЛИСТ ${n}`;$('#page-count').textContent=n===0?'ВХОД':`${n} / 5`;$('#progress').innerHTML=Array.from({length:5},(_,i)=>`<span class="${i<n?'done':''}"></span>`).join('');$('#content').innerHTML=pages[n]();$('#foot-nav').innerHTML=`<button class="navbtn" id="go-back" ${n===0?'disabled':''}>← ${n===0?'НАЗАД':'ПРЕДЫДУЩИЙ ЛИСТ'}</button><span>${esc(pageNames[n])}</span>${n<state.unlocked?'<button class="navbtn" id="go-next">ДАЛЕЕ →</button>':''}`;
+if(n===1)renderAttempt('code1');if(n===2)renderAttempt('code2');if(n===3)renderAttempt('coords');
+if([1,2,3].includes(n))countdownTimer=setInterval(()=>renderAttempt(n===1?'code1':n===2?'code2':'coords'),1000);
+if(demo){let panel=document.createElement('details');panel.className='testpanel';panel.innerHTML=`<summary>ДЕМО · Коды и инструменты проверки</summary><ul><li>Первая часть: <strong>452</strong></li><li>Вторая часть: <strong>683</strong></li><li>Цветные ячейки сверху: 6, 8, 4, 3, 2, 5.</li><li>Полные координаты: 12.268413, 109.205364</li><li>Неверный ответ три раза — блокировка на 2 минуты.</li></ul><button class="btn secondary small" id="reset-demo">СБРОСИТЬ ТЕСТ</button>`;$('#content').appendChild(panel)}
+save();}
+function verifyCode(which){const el=$(`#answer-${which}`);if(!el)return;const val=el.value.replace(/\D/g,'');if(val.length!==3){$(`#feedback-${which}`).textContent='Нужно ввести ровно три цифры.';return}attempt(which,val===(which==='code1'?'452':'683'),()=>unlock(which==='code1'?2:3))}
+function verifyCoordinates(){const answer={G1:'6',G2:'8',Y1:'4',G3:'3',Y3:'2',Y2:'5'};const all=Object.keys(answer).every(k=>state.coord[k]&&state.coord[k].length===1);if(!all){$('#feedback-coords').textContent='Заполните все шесть пропусков.';return}const correct=Object.keys(answer).every(k=>state.coord[k]===answer[k]);attempt('coords',correct,()=>unlock(4))}
+function reset(){if(!confirm('Сбросить прогресс и все попытки? Начать заново?'))return;state=defaultState();save();render();toast('Атлас готов к новому испытанию')}
+const target=new URLSearchParams(location.search);if(target.get('seal')==='I'&&target.get('scan')==='demo'&&state.unlocked>=4){state.current=5;state.unlocked=5}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+if(b.id==='start'){state.team=($('#team')?.value||'').trim();unlock(1)}
+else if(b.id==='go-back')toPage(state.current-1);
+else if(b.id==='go-next')toPage(state.current+1);
+else if(b.id==='verify-code1')verifyCode('code1');
+else if(b.id==='verify-code2')verifyCode('code2');
+else if(b.id==='verify-coords')verifyCoordinates();
+else if(b.id==='simulate-qr')unlock(5);
+else if(b.id==='reset-demo'||b.id==='reset-inside')reset();
+else if(b.id==='toggle-demo'){demo=!demo;render();toast(demo?'Тестовый режим включён':'Тестовый режим выключен')}
+else if(b.hasAttribute('data-copy'))copy(b.getAttribute('data-copy'));
+});
+document.addEventListener('input',e=>{if(e.target.classList.contains('code-input'))e.target.value=e.target.value.replace(/\D/g,'').slice(0,3);if(e.target.matches('[data-slot]')){e.target.value=e.target.value.replace(/\D/g,'').slice(-1);state.coord[e.target.dataset.slot]=e.target.value;save();if(e.target.value){const slots=[...document.querySelectorAll('[data-slot]')];const idx=slots.indexOf(e.target);if(slots[idx+1])slots[idx+1].focus()}}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList.contains('code-input')){const key=e.target.id.endsWith('code1')?'code1':'code2';verifyCode(key)}if(e.key==='Backspace'&&e.target.matches('[data-slot]')&&!e.target.value){const slots=[...document.querySelectorAll('[data-slot]')];const prev=slots[slots.indexOf(e.target)-1];prev?.focus()}});
+render();
+})();
 </script>
-
-</body>
-</html>
+</body></html>
